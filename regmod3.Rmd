@@ -1,0 +1,159 @@
+---
+title: "Regression Model Course Project"
+output: word_document
+---
+
+## Executive Summary
+For this project, we utilize the mtcars data set in R to explore the relationship betweeen a set of variables and miles per gallon (MPG).  The mtcars data was extracted from the 1974 Motor Trend US magazine. Two main questions need to be answered: (1) "Is an automatic or manual transmission better for MPG"  (2) "Quantify the MPG difference between automatic and manual transmissions".  The mtcars data set consists of only 32 cars with 11 variables (MPG (miles per gallon), cyl (number of cylinders), disp (displacement), hp (horse power), drat (rear axel ratio), wt(weight in pounds), qsec(quarter mile time), vs(v or straight engine configuration), am(automatic or manual transmission), gear(number of gears), carb(number of carburetors)).  We determined there is no strong relationship between MPG and transmission type.  However, we noticed that lighter cars are much more likely to have manual transmissions. Also, lighter cars tend to get better MPG than heavier cars. The average MPG for the mtcars data set is 20.09.  The average MPG for cars with a manual transmission is 21.  The average MPG for cars with an automatic transmission is 17.15.  Overall, cars with manual transmissions in the mtcars data set get 3.85 mpg more than cars with automatic transmissions.
+
+#### Interpreting the Coefficients
+MPG decreases with an increase in cyl, hp, wt, carb.
+There is a positive correlation between disp, drat, qsec, vs, am (automatic-0, manual-1), gear, vs(v-engine-0, straight-engine-1) and MPG.
+Looking at the summary of the linear model of mpg to all the other variables (Figure 1 Appendix), we see wt has the lowest p-value and is therefore most strongly correlated to mpg.  Fitting another model of wt to am, we see from the summary (Figure 2 Appendix) there is a high correlation between wt & am, due to very low p-value, p-value: 1.1e-05.  We fit a model of mpg to wt(weight).  This gives the MPG for the average wt (weight) car.  
+In Figure 3, the coef(fitwt) intercept of 37.285 is the expected MPG for a 0 wt car.  Obviously, we cannot have a car that weighs 0.  To get a more interpretable intercept we fit a new model, subtracting out the mean.  The expected MPG for the average wt (weight) car is 20.091 MPG.
+
+#### Exploratory Data Analyses
+For each of 10 variables, we fit a linear model correlating to mpg.  We plot this and fit a line through the points for those with a negative correlation.  See Figure 4 in Appendix.  Based on the plots, we see there is a pretty good negative correlation between mpg and wt(weight) (i.e. an increase in weight causes a decrease in mpg).  Disp & hp have a similar relationship with mpg, but not as tight of a relationship.  The relationship between mpg and the other variables is not as clear.
+
+```{r, echo=FALSE}
+fitwt<-lm(mpg~wt,data=mtcars)
+
+fitdisp<-lm(mpg~disp,data=mtcars)
+
+fitcyl<-lm(mpg~cyl,data=mtcars)
+
+fithp<-lm(mpg~hp,data=mtcars)
+
+fitam<-lm(mpg~am,data=mtcars)
+
+fitdrat<-lm(mpg~drat,data=mtcars)
+
+fitgear<-lm(mpg~gear,data=mtcars)
+
+fitcarb<-lm(mpg~carb,data=mtcars)
+
+fitqsec<-lm(mpg~qsec,data=mtcars)
+
+fitvs<-lm(mpg~vs,data=mtcars)
+
+```
+
+#### Fitting the models
+Linear Models were fit from mpg to each of the 10 remaining variables to determine correlation.  A linear model was fit from mpg to the mean weight to get a more interpretable value for the intercept to get the expected MPG for the average weight car.  A linear model was also fit from wt to am to show the strong correlation between the two variables.
+
+#### Answering the questions
+"Is an automatic or manual transmission better for MPG"
+This cannot be answered, since the most relevant variable is wt and not
+whether the car is automatic or manual transmission.  In fact, there is a
+high correlation between weight and whether the car is automatic or manual.
+In general, manual transmissions correspond with lower weight cars.
+Automatic transmissions correspond with higher weight cars.  Also, in
+general, lower weight cars get better MPG.  If all the lower weight cars were orange and all the other cars were not orange, we could say in general, the orange cars get better MPG, but we could not say the cars get better MPG because they are orange.  In the same way, we can not say the cars get better MPG because they are manual transmission.  There is simply not enough data to substantiate that.
+
+"Quantify the MPG difference between automatic and manual transmissions"
+See Figure 5 for Average MPG values
+
+This last value in Figure 5 is the MPG amount a manual gets greater than an automatic, 3.853 MPG.  As we have already indicated though, the correlation to MPG should be with wt(weight) and not am(transmission type).
+Using the Analysis of Variance (Figure 6 Appendix), the very low p-value, 1.3e-10, indicates there is a very high correlation between weight (wt) and MPG (i.e. lower weight corresponds with higher MPG).
+
+#### Residual plot and diagnostics
+The residual plot of wt and mpg has roughly half the values above the 0 horizontal line and roughly half below (left plot of figure 7).  A density plot (the middle plot of Figure 7) gives us a fairly, though not perfect, normal distribution.  Also, a qqnorm plot (right plot Figure 7) gives us a fairly normal distribution.  This means we have a pretty good model fit for mpg to wt.
+
+#### Quantifying the uncertainty in conclusions and performing inference
+
+With 95% confidence, we estimate with every 1000 pound increase in weight, MPG will decrease by 4.203 to 6.486 (See Figure 8 Appendix).  This was determined by doing a summary of the coefficients of the fitted wt (weight) model.
+
+#### Appendix
+
+##### Figure 1
+```{r, echo=FALSE}
+summary(lm(mpg ~ . , data = mtcars))
+```
+
+##### Figure 2
+```{r, echo=FALSE}
+summary(lm(wt ~ am , data = mtcars))
+```
+
+##### Figure 3
+```{r, echo=FALSE}
+fitwt<-lm(mpg~wt,data=mtcars)
+coef(fitwt)
+fitwtmean<-lm(mpg~I(wt-mean(wt)),data=mtcars)
+coef(fitwtmean)
+```
+
+##### Figure 4
+```{r, echo=FALSE}
+par(mfrow = c(2, 3),cex.lab=0.9)
+
+plot(mpg~wt,data=mtcars)
+abline(fitwt,col="blue")
+
+plot(mpg~disp,data=mtcars)
+abline(fitdisp,col="red")
+
+plot(mpg~cyl,data=mtcars)
+abline(fitcyl,col="red")
+
+plot(mpg~hp,data=mtcars)
+abline(fithp,col="red")
+
+plot(mpg~carb,data=mtcars)
+abline(fitcarb,col="red")
+
+##plot(mpg~am,data=mtcars)
+##abline(fitam,col="red")
+
+##plot(mpg~drat,data=mtcars)
+##abline(fitdrat,col="red")
+
+##plot(mpg~gear,data=mtcars)
+##abline(fitgear,col="red")
+
+##plot(mpg~qsec,data=mtcars)
+##abline(fitqsec,col="red")
+
+##plot(mpg~vs,data=mtcars)
+##abline(fitvs,col="red")
+```
+
+##### Figure 5
+Average MPG for mtcars data set
+```{r, echo=FALSE}
+with(mtcars, mean(mpg))
+```
+Average MPG manual transmission
+```{r, echo=FALSE}
+with(mtcars, mean(mpg[am=1]))
+```
+Average MPG automatic
+```{r, echo=FALSE}
+with(mtcars, mean(mpg[am!=1]))
+```
+Difference MPG between manual and automatic
+```{r, echo=FALSE}
+with(mtcars, mean(mpg[am=1])) - with(mtcars, mean(mpg[am!=1]))
+```
+
+##### Figure 6
+```{r, echo=FALSE}
+anova(fitwt)
+```
+
+##### Figure 7
+
+```{r, echo=FALSE}
+par(mfrow = c(1, 3),cex.lab=0.9)
+plot(mtcars$wt, resid(fitwt), main="Residual Plot")
+abline(h=0)
+plot(density(resid(fitwt)), main="Density Plot")
+qqnorm(resid(fitwt))
+qqline(resid(fitwt))
+```
+
+##### Figure 8
+```{r, echo=TRUE}
+sumCoef<-summary(fitwt)$coefficients
+sumCoef[2,1] + c(-1,1) * qt(.975, df=fitwt$df)*sumCoef[2,2]
+```
